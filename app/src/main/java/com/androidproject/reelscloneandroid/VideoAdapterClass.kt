@@ -10,6 +10,7 @@ import android.widget.Toast
 import android.widget.VideoView
 import androidx.recyclerview.widget.RecyclerView
 import com.androidproject.reelscloneandroid.databinding.ListVideoBinding
+import com.androidproject.reelscloneandroid.model.ExoPlayerItem
 import com.androidproject.reelscloneandroid.model.Video
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -21,11 +22,13 @@ import com.google.android.exoplayer2.upstream.DefaultDataSource
 
 class VideoAdapterClass(
     val context: Context,
-    val videoArrayList: ArrayList<Video>
+    val videoArrayList: ArrayList<Video>,
+    var videoPreparedListener: onVideoPreparedListener
 ) : RecyclerView.Adapter<VideoAdapterClass.VideoViewHolder>() {
     class VideoViewHolder(
         val binding: ListVideoBinding,
-        var context: Context
+        var context: Context,
+        var videoPreparedListener: onVideoPreparedListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private lateinit var exoPlayer: ExoPlayer
@@ -74,13 +77,14 @@ class VideoAdapterClass(
             }
 
 
+            videoPreparedListener.onVideoPrepared(ExoPlayerItem(exoPlayer,absoluteAdapterPosition))
         }
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoViewHolder {
         val view = ListVideoBinding.inflate(LayoutInflater.from(context), parent, false)
-        return VideoViewHolder(view, context)
+        return VideoViewHolder(view, context,videoPreparedListener)
     }
 
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
@@ -92,5 +96,9 @@ class VideoAdapterClass(
 
     override fun getItemCount(): Int {
         return videoArrayList.size ?: 0
+    }
+
+    interface onVideoPreparedListener {
+        fun onVideoPrepared(exoPlayerItem : ExoPlayerItem)
     }
 }
